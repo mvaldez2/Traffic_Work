@@ -245,6 +245,8 @@ if not os.path.exists(save_dir):
 # First, create a list of paired loop, pods
 list_of_looppod_pairs = [[13,54], [13, 53], [14, 52], [14, 51], [10, 56], [10, 55], [17, 50], [17, 49]]
 
+error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
+
 combined_error = pd.DataFrame()
 
 for i in range(len(list_of_looppod_pairs)):
@@ -254,6 +256,44 @@ for i in range(len(list_of_looppod_pairs)):
                   date_string+
                   '_'+'LoopCh'+str(pair[0])+'_'+'PodCh'+str(pair[1])+'.csv')
     combined_error = combined_error.append(errors)
+    
+    ## 85th Percentile Errors    
+    #reset df
+    error_85 = error_85[0:0]
+    
+    # Overall error
+    error_85.loc[-1] = ['Overall',  errors['Duration'].quantile(0.85) ]  
+    error_85.index = error_85.index + 1  
+    error_85 = error_85.sort_index()
+      
+    # During Green error
+    during_green = errors.loc[errors.Light=='During Green', :]
+    error_85.loc[-1] = ['During Green',  during_green['Duration'].quantile(0.85) ]  
+    error_85.index = error_85.index + 1  
+    error_85 = error_85.sort_index()    
+    
+    # Not Green error
+    not_green = errors.loc[errors.Light=='Not Green', :]
+    error_85.loc[-1] = ['Not Green',  not_green['Duration'].quantile(0.85) ]  
+    error_85.index = error_85.index + 1  
+    error_85 = error_85.sort_index() 
+    
+    # L1P0 Green error
+    L1P0 = errors.loc[errors['Error Type']=='L1P0', :]
+    error_85.loc[-1] = ['L1P0',  L1P0['Duration'].quantile(0.85) ]  
+    error_85.index = error_85.index + 1  
+    error_85 = error_85.sort_index()
+    
+    # L0P1 Green error
+    L0P1 = errors.loc[errors['Error Type']=='L0P1', :]
+    error_85.loc[-1] = ['L0P1',  L0P1['Duration'].quantile(0.85) ]  
+    error_85.index = error_85.index + 1  
+    error_85 = error_85.sort_index()          
+        
+    error_85.to_csv(save_dir+'\\'+
+                  date_string+
+                  '_'+'85th_error_'+'LoopCh'+str(pair[0])+'_'+'PodCh'+str(pair[1])+'.csv')
+    
     
     colors = []
     
@@ -276,39 +316,7 @@ for i in range(len(list_of_looppod_pairs)):
                 format='svg')
 
 
-## 85th Percentile Errors    
-error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
-
-# Overall error
-error_85.loc[-1] = ['Overall',  errors['Duration'].quantile(0.85) ]  
-error_85.index = error_85.index + 1  
-error_85 = error_85.sort_index()
-  
-# During Green error
-during_green = errors.loc[errors.Light=='During Green', :]
-error_85.loc[-1] = ['During Green',  during_green['Duration'].quantile(0.85) ]  
-error_85.index = error_85.index + 1  
-error_85 = error_85.sort_index()    
-
-# Not Green error
-not_green = errors.loc[errors.Light=='Not Green', :]
-error_85.loc[-1] = ['Not Green',  not_green['Duration'].quantile(0.85) ]  
-error_85.index = error_85.index + 1  
-error_85 = error_85.sort_index() 
-
-# L1P0 Green error
-L1P0 = errors.loc[errors['Error Type']=='L1P0', :]
-error_85.loc[-1] = ['L1P0',  L1P0['Duration'].quantile(0.85) ]  
-error_85.index = error_85.index + 1  
-error_85 = error_85.sort_index()
-
-# L0P1 Green error
-L0P1 = errors.loc[errors['Error Type']=='L0P1', :]
-error_85.loc[-1] = ['L0P1',  L0P1['Duration'].quantile(0.85) ]  
-error_85.index = error_85.index + 1  
-error_85 = error_85.sort_index()          
-    
-error_85.to_csv(save_dir + '\\' + date_string+ '_85th_error.csv')      
+      
         
         
         
