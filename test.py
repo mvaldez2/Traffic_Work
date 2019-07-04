@@ -85,9 +85,6 @@ def vc(df, pod1, pod2):
             
     
     #df = df[['Timestamp', 'Event Type', 'Parameter', 'during', 'Keep']]
-    #use this to find a pattern
-    #elif row['Last pod'] != row['pod'] and (row['Event Type'] == 82 and row['Next Event Type'] == 82):
-    #        mark.append(False)
     
     df = df.loc[df.Keep==True, :]
     df = df[['Timestamp', 'Event Type', 'Parameter']] 
