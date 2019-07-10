@@ -30,16 +30,14 @@ import datetime
 
 #root_dir = args.infile
 
-data = pd.read_csv("2019_06_12.csv", header=0)#, skiprows=range(1,8))  # row skip unneeded if using processed files
-
-# Fix timestamps to be in proper format
-data['Timestamp'] = pd.to_datetime(data['Timestamp'], format="%m/%d/%Y %H:%M:%S.%f")
+data = pd.read_csv("2019_7_3_gen_errors.csv", header=0)#, skiprows=range(1,8))  # row skip unneeded if using processed files
+data['Timestamp'] = pd.to_datetime(data.Timestamp)
 #display(data.head())
 
 
 # Find only Event types 81-100, and Parameters of either 13, 14, 10, 17 and 53-54, 51-52, 55-56, 49-50
 data = data.loc[data['Event Type'].isin([81, 82, 1, 7])]
-data = data.loc[data['Parameter'].isin([10,13,14,17,49,50,51,52,53,54,55,56, 2])]
+
 
 #add if green column
 lights = []
@@ -243,7 +241,7 @@ if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
 # First, create a list of paired loop, pods
-list_of_looppod_pairs = [[13,54], [13, 53], [14, 52], [14, 51], [10, 56], [10, 55], [17, 50], [17, 49]]
+list_of_looppod_pairs = [[1334,64], [1435, 63], [1736, 62]]
 
 error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
 
