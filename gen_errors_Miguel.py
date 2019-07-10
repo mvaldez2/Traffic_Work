@@ -35,12 +35,13 @@ data['Timestamp'] = pd.to_datetime(data.Timestamp)
 #display(data.head())
 
 
-# Find only Event types 81-100, and Parameters of either 13, 14, 10, 17 and 53-54, 51-52, 55-56, 49-50
+# Find only Event types 81, 82 for on/off and 1, 7 for green light events
 data = data.loc[data['Event Type'].isin([81, 82, 1, 7])]
 
 
 #add if green column
 lights = []
+#finds starting and end points for green light events
 for index, row in data.iterrows():
     if row['Event Type'] == 1 and row['Parameter']==2:
         lights.append('Green Start')
@@ -54,6 +55,7 @@ data['Light'] = lights
 data['Next Light'] = data['Light'].shift(-1)
 data['Last Light'] = data['Light'].shift(1)
 during = []
+#checks if row is during green
 for index, row in data.iterrows():
     if (row['Event Type'] == 81 or row['Event Type'] == 82) and row['Next Light'] != 'Green Start' and row['Last Light']!= 'Green Start':
         during.append('Not Green')
@@ -63,8 +65,8 @@ for index, row in data.iterrows():
        during.append('During Green') 
 data['During'] = during
 
+#finds rows between start and end points
 i = 0
-
 while i <10:
     data['Last During'] = data['During'].shift(1)
     for index, row in data.iterrows():
@@ -230,7 +232,7 @@ def gen_errors(loop_ch, pod_ch, df):
 
 ## Running error generation for all pairs, export .csv and .pdf
 
-# Create directory to save error .csvs and graphs to:
+# Create directory to save error .csv and graphs to:
 date_string = str(str(data['Timestamp'].iloc[0].year)+'_'+
                   str(data['Timestamp'].iloc[0].month)+'_'+
                   str(data['Timestamp'].iloc[0].day))
@@ -240,7 +242,7 @@ save_dir = date_string
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
-# First, create a list of paired loop, pods
+# First, create a list of paired loop, pods (currently using virtual channels)
 list_of_looppod_pairs = [[1334,64], [1435, 63], [1736, 62]]
 
 error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
