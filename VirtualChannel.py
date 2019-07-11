@@ -116,7 +116,7 @@ def vc(df, loop1, loop2):
     during = []
     df['Last Keep'] = df['Keep'].shift(1)
 
-    #identifies starting points and points of rows to remove
+    #identifies starting and end points of rows to remove
     for index, row in df.iterrows():
         if row['Last pod'] != row['pod'] and \
             (row['Event Type'] == 82 and row['Last Event Type'] == 82) and \
@@ -130,7 +130,7 @@ def vc(df, loop1, loop2):
             during.append('normal')
     df['during'] = during
 
-    #finds rows between starting points and end points to mark for deletion
+    #finds rows between starting and end points to mark for deletion
     i = 0
     while i < 20:
         df['Next during'] = df['during'].shift(-1)
@@ -178,7 +178,7 @@ ex: combine_df(vc1334, vc1435, vc1736)
 '''
 def combine_df(*vc):
     #excludes loops used in virtual channels
-    combine = to_combine[~to_combine['Parameter'].isin([loops])]
+    combine = to_combine[~to_combine['Parameter'].isin(loops)]
     #combines virtual channels into original dataframe
     errors = combine.append([*vc])
     errors = errors.sort_values(by=['Timestamp'])

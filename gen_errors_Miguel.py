@@ -247,15 +247,24 @@ list_of_looppod_pairs = [[1334,64], [1435, 63], [1736, 62]]
 
 error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
 
+
+
 combined_error = pd.DataFrame()
 
 for i in range(len(list_of_looppod_pairs)):
     pair = list_of_looppod_pairs[i]
     errors = gen_errors(pair[0], pair[1], data)
+    error_filter = errors.loc[((errors['Light'] == 'Not Green' )& (errors['Duration'] > 5)) | ((errors['Light'] == 'During Green') & (errors['Duration'] > 1))]
+    error_filter.to_csv(save_dir+'\\'+
+                  date_string+
+                  '_above_threshold_'+'LoopCh'+str(pair[0])+'_'+'PodCh'+str(pair[1])+'.csv')
+        
+    errors = errors.loc[((errors['Light'] == 'Not Green' )& (errors['Duration'] < 5)) | ((errors['Light'] == 'During Green') & (errors['Duration'] < 1))]
     errors.to_csv(save_dir+'\\'+
                   date_string+
                   '_'+'LoopCh'+str(pair[0])+'_'+'PodCh'+str(pair[1])+'.csv')
     combined_error = combined_error.append(errors)
+    
     
     ## 85th Percentile Errors    
     #reset df

@@ -1,6 +1,6 @@
 ,Type,85th percentile error
-0,L0P1,0.6
+0,L0P1,0.5
 1,L1P0,0.1
-2,Not Green,0.48500000000000226
-3,During Green,0.4049999999999983
-4,Overall,0.475
+2,Not Green,0.4
+3,During Green,0.4
+4,Overall,0.4
