@@ -1,9 +1,15 @@
 import pandas as pd
 from matplotlib.pyplot import step, show
+from tkinter import filedialog
+from tkinter import *
+
+root = Tk()
+root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
+
 
 pd.options.display.max_columns = 50
 
-data = pd.read_csv("2019_07_03.csv", header=0)
+data = pd.read_csv(root.filename, header=0)
 
 # Fix timestamps to be in proper format
 data['Timestamp'] = pd.to_datetime(data.Timestamp)
@@ -17,6 +23,8 @@ loops = []
 date_string = str(str(data['Timestamp'].iloc[0].year)+'_' +
                   str(data['Timestamp'].iloc[0].month)+'_' +
                   str(data['Timestamp'].iloc[0].day))
+
+save_dir = 'T:\SR2\errors\\'+date_string
 
 #gets only on/off events
 data = data.loc[data['Event Type'].isin(range(81, 100))]
@@ -150,7 +158,7 @@ def vc(df, loop1, loop2):
     df = df[['Timestamp', 'Event Type', 'Parameter']]
 
     #outputs virtual channel to .csv file
-    df.to_csv('loops' + str(loop1) + '-' + str(loop2) + '-virtualchannel.csv')
+    df.to_csv(save_dir +'\\'+ 'loops' + str(loop1) + '-' + str(loop2) + '-virtualchannel.csv')
 
     return df
 
@@ -172,7 +180,7 @@ def compare(data, vc, pod, start, end):
 
 '''
 combines virtual channels into original dataframe and removes loops associated with
-the virtual channels and outputs .csv file to run on gen_errors scripts which finds errors
+the virtual channels and outputs date_gen_errors.csv file to run on gen_errors scripts which finds errors
 *vc: virtual channels
 ex: combine_df(vc1334, vc1435, vc1736)
 '''
@@ -183,7 +191,7 @@ def combine_df(*vc):
     errors = combine.append([*vc])
     errors = errors.sort_values(by=['Timestamp'])
     #outputs .csv file to use with gen_errors script
-    errors.to_csv(date_string + '_gen_errors.csv')    
+    errors.to_csv(save_dir +'\\'+date_string + '_gen_errors.csv')    
     return errors
 
 
@@ -192,7 +200,7 @@ vc1334 = vc(data, 13, 34)
 vc1435 = vc(data, 14, 35)
 vc1736 = vc(data, 17, 36)
 
-combine_df(vc1334, vc1435, vc1736)
+combine_df(vc1334, vc1435, vc1736) #you have to run this funtion if you want to generate errors 
 
 compare(data, vc1334, 64, '14:00', '14:05')
 compare(data, vc1435, 63, '14:00', '14:05')
