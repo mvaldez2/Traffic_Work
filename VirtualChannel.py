@@ -2,6 +2,7 @@ import pandas as pd
 from matplotlib.pyplot import step, show
 from tkinter import filedialog
 from tkinter import *
+import os
 
 root = Tk()
 root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
@@ -24,7 +25,10 @@ date_string = str(str(data['Timestamp'].iloc[0].year)+'_' +
                   str(data['Timestamp'].iloc[0].month)+'_' +
                   str(data['Timestamp'].iloc[0].day))
 
-save_dir = 'T:\SR2\errors\\'+date_string
+save_dir = 'T:\SR2\errors\\'+date_string+'test'
+
+if not os.path.exists(save_dir):
+    os.mkdir(save_dir)
 
 #gets only on/off events
 data = data.loc[data['Event Type'].isin(range(81, 100))]

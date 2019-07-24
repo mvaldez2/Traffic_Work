@@ -17,6 +17,20 @@ from matplotlib.pyplot import step, show
 
 root = Tk()
 root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
+
+constant_on = .04
+constant_off = .09
+
+variable_onG = .03
+variable_offG = .07
+variable_on = .06
+variable_off = .15
+
+activation_diff_g = variable_onG
+termination_diff_g = variable_offG
+activation_diff = variable_on
+termination_diff = variable_off
+
 virtual_channel = pd.read_csv(root.filename, header=0)
 
 # Fix timestamps to be in proper format
@@ -167,6 +181,7 @@ def vc(df, loop1, loop2):
     df = df.loc[(df.Keep == True) & (df.during == 'normal')] 
 
     df = df[['Timestamp', 'Event Type', 'Parameter']]
+    diff = []
 
     #outputs virtual channel to .csv file
     df.to_csv(save_dir +'\\'+ 'loops' + str(loop1) + '-' + str(loop2) + '-virtualchannel.csv')
@@ -221,7 +236,7 @@ compare(virtual_channel, vc1736, 62, '14:00', '14:05')
 
 # Find only Event types 81, 82 for on/off and 1, 7 for green light events
 data = data.loc[data['Event Type'].isin([81, 82, 1, 7])]
-data = data.loc[data['Parameter'].isin([1334, 1435, 1736, 62, 63, 64, 2])] #change if trying different loops and pods (DON'T remove 2)
+data = data.loc[data['Parameter'].isin([10, 1334, 1435, 1736, 55, 62, 63, 64, 2])] #change if trying different loops and pods (DON'T remove 2)
 
 
 #add if green column
@@ -258,7 +273,21 @@ while i <10:
         if (row['Event Type'] == 81 or row['Event Type'] == 82) and row['Last During'] == 'During Green' and (row['Last Light'] != 'Green End' ): 
             data.at[index,'During'] = 'During Green'
     i =  i + 1
-        
+diff = []
+for index, row in data.iterrows():
+    if row['Event Type'] == 82 and row.Parameter == 10 or row.Parameter == 55:
+        diff.append(row.Timestamp - datetime.timedelta(seconds=activation_diff))
+    elif row['Event Type'] == 81 and row.Parameter == 10 or row.Parameter == 55:
+        diff.append(row.Timestamp - datetime.timedelta(seconds=termination_diff))
+    elif row['Event Type'] == 82 and row['During'] == 'During Green':
+        diff.append(row.Timestamp - datetime.timedelta(seconds=activation_diff_g))
+    elif row['Event Type'] == 82 and row['During'] == 'Not Green':
+        diff.append(row.Timestamp - datetime.timedelta(seconds=activation_diff))
+    elif row['Event Type'] == 81 and row['During'] == 'During Green':
+        diff.append(row.Timestamp + datetime.timedelta(seconds=termination_diff_g))
+    elif row['Event Type'] == 81 and row['During'] == 'Not Green':
+        diff.append(row.Timestamp + datetime.timedelta(seconds=termination_diff))
+data['Timestamp'] = diff      
 
 ## Error generation function
 
@@ -427,7 +456,7 @@ if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
 # First, create a list of paired loop, pods (currently using virtual channels)
-list_of_looppod_pairs = [[1334,64], [1435, 63], [1736, 62]] #change if trying different loops and pods
+list_of_looppod_pairs = [[10, 55], [1334, 64], [1435, 63], [1736, 62]] #change if trying different loops and pods
 
 error_85 = pd.DataFrame(columns=['Type', '85th percentile error'])
 
