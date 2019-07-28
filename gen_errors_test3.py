@@ -26,10 +26,10 @@ variable_offG = .07
 variable_on = .06
 variable_off = .15
 
-activation_diff_g = constant_on
-termination_diff_g = constant_off
-activation_diff = constant_on
-termination_diff = constant_off
+activation_diff_g = variable_onG
+termination_diff_g = variable_offG
+activation_diff = variable_on
+termination_diff = variable_off
 
 
 data = pd.read_csv(root.filename, header=0)#, skiprows=range(1,8))  # row skip unneeded if using processed files
