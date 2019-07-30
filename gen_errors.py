@@ -17,13 +17,13 @@ from tkinter import *
 root = Tk()
 root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
 
-constant_on = .04
-constant_off = .09
+constant_on = 0
+constant_off = 0
 
-variable_onG = .03
-variable_offG = .07
-variable_on = .06
-variable_off = .15
+variable_onG = 0
+variable_offG = 0
+variable_on = 0
+variable_off = 0
 
 activation_diff_g = variable_onG
 termination_diff_g = variable_offG
